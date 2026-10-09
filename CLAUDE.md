@@ -104,3 +104,13 @@ Claude review is **not** automatic — comment `@claude review` on the PR to tri
 - It posts inline review-thread comments **plus** a sticky summary comment ("**Claude finished … task**"). The action does **not** submit a formal GitHub review, so `claude[bot]` never appears in `gh pr view --json reviews` / `reviewDecision` and is **not** a required check — do not infer "claude reviewed" from those.
 - `gh pr checks` may show a `claude` entry as **skipping**: every comment (incl. other bots') fires `claude.yml`, and runs not from a `teng-lin` `@claude` comment correctly skip via the job `if:` gate. That skip is **not** the review run — find the real one with `gh run list --workflow=claude.yml --json event,conclusion` (look for the `success` run) or just read the comment below.
 - Before merging, confirm the review landed and address it. The two halves live on different endpoints: the sticky summary is an **issue** comment (`gh api /repos/<owner>/<repo>/issues/<PR>/comments`), and the inline findings are **pull-request review** comments on the diff (`gh api /repos/<owner>/<repo>/pulls/<PR>/comments`) — filter either with `--jq '.[]|select(.user.login=="claude[bot]").body'`. Resolve any inline `claude[bot]` threads like any other bot's.
+
+## graphify
+
+This project has a knowledge graph at graphify-out/ with god nodes, community structure, and cross-file relationships.
+
+Rules:
+- For codebase questions, first run `graphify query "<question>"` when graphify-out/graph.json exists. Use `graphify path "<A>" "<B>"` for relationships and `graphify explain "<concept>"` for focused concepts. These return a scoped subgraph, usually much smaller than GRAPH_REPORT.md or raw grep output.
+- If graphify-out/wiki/index.md exists, use it for broad navigation instead of raw source browsing.
+- Read graphify-out/GRAPH_REPORT.md only for broad architecture review or when query/path/explain do not surface enough context.
+- After modifying code, run `graphify update .` to keep the graph current (AST-only, no API cost).
